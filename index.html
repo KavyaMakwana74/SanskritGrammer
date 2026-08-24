@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="sa">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="संस्कृत व्याकरण संशोधक एवं शब्दकोश - 100% Hard-Coded Rule-Based Sanskrit Grammar Analyzer, Spell Corrector and Sanskrit Dictionary based on Paninian Vyakarana.">
+    <title>संस्कृत व्याकरण संशोधक एवं शब्दकोश | Sanskrit Grammar Corrector & Dictionary</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>संस्कृत व्याकरण संशोधक एवं शब्दकोश</h1>
+            <p class="header-subtitle">Sanskrit Grammar Engine & Lexicon Explorer</p>
+        </div>
+    </header>
+
+    <main class="main-container">
+
+        <!-- Navigation Tabs: Grammar Corrector vs Dictionary Explorer -->
+        <div class="nav-tabs-wrapper">
+            <button type="button" id="tabGrammarBtn" class="nav-tab-btn active" onclick="switchTab('grammar')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+                व्याकरण-संशोधक (Grammar & Spell Corrector)
+            </button>
+            <button type="button" id="tabDictBtn" class="nav-tab-btn" onclick="switchTab('dictionary')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+                संस्कृत-शब्दकोशः (Sanskrit Dictionary & Paradigms)
+            </button>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 1: GRAMMAR & SPELLING CORRECTOR VIEW -->
+        <!-- ============================================== -->
+        <div id="grammarView">
+            <!-- Input Section Card -->
+            <section class="card input-card" aria-label="Sanskrit Input Section">
+                <div class="input-header-bar">
+                    <h2 class="section-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
+                        संस्कृत-वाक्य-प्रवेशः (Enter Sanskrit Sentence)
+                    </h2>
+
+                    <div class="translit-toggle-box">
+                        <label for="autoTranslit">
+                            <input type="checkbox" id="autoTranslit" checked>
+                            English / IAST Auto-Convert
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Virtual Sanskrit Diacritics Bar -->
+                <div class="diacritics-bar" aria-label="Virtual Sanskrit Diacritics Toolbar">
+                    <span class="diacritics-label">त्वरित-चिह्नानि:</span>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('्')"
+                        title="हलन्तः (Virama)">्</button>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('ः')"
+                        title="विसर्गः (Visarga)">ः</button>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('ं')"
+                        title="अनुस्वारः (Anusvara)">ं</button>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('ऽ')"
+                        title="अवग्रहः (Avagraha)">ऽ</button>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('।')"
+                        title="दण्डः (Danda)">।</button>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('॥')"
+                        title="द्विदण्डः (Double Danda)">॥</button>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('ऋ')" title="ऋकारः">ऋ</button>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('ॠ')"
+                        title="दीर्घ ऋकारः">ॠ</button>
+                    <button type="button" class="diacritic-btn" onclick="insertDiacritic('ॐ')"
+                        title="प्रणवः (Om)">ॐ</button>
+                </div>
+
+                <div class="input-wrapper">
+                    <textarea id="sanskritInput"
+                        placeholder="Type in English (e.g. gachhami, balakah, ramoh, aham pustakam pathami) or Devanagari (यथा — राम वनं गच्छति / सः विद्यालयं गछती)..." rows="4"
+                        spellcheck="false" autocomplete="off"></textarea>
+                </div>
+
+                <!-- Preset Test Examples & Action Buttons -->
+                <div class="actions-bar">
+                    <div class="example-chips-wrapper">
+                        <span class="examples-label">उदाहरणानि (Examples):</span>
+                        <button type="button" class="chip-btn" onclick="loadExample('gachhami')">gachhami (गच्छामि)</button>
+                        <button type="button" class="chip-btn" onclick="loadExample('balakah vanam gachhati')">balakah vanam gachhati</button>
+                        <button type="button" class="chip-btn" onclick="loadExample('ramoh vanam gachhati')">ramoh vanam gachhati</button>
+                        <button type="button" class="chip-btn" onclick="loadExample('aham pustakam pathami')">aham pustakam pathami</button>
+                        <button type="button" class="chip-btn" onclick="loadExample('राम वनं गच्छति।')">राम वनं गच्छति। (Bare Stem)</button>
+                        <button type="button" class="chip-btn" onclick="loadExample('सः विद्यालयं गछती।')">सः विद्यालयं गछती। (Spelling Typos)</button>
+                        <button type="button" class="chip-btn" onclick="loadExample('रामः फलः खादति।')">रामः फलः खादति।</button>
+                        <button type="button" class="chip-btn" onclick="loadExample('द्वौ बालकः क्रीडतः।')">द्वौ बालकः क्रीडतः।</button>
+                        <button type="button" class="chip-btn" onclick="loadExample('देवः भक्तं वरं ददाति।')">देवः भक्तं वरं ददाति।</button>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn-secondary" onclick="clearInput()">
+                            मार्जयतु (Clear)
+                        </button>
+                        <button type="button" id="correctButton" class="btn-primary" onclick="correctSanskrit()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+                            </svg>
+                            संशोधयतु (Analyze & Correct)
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section Card (Shown after analysis) -->
+            <section id="resultContainer" class="card result-card" aria-label="Grammar Analysis Results">
+
+                <!-- Status Banner -->
+                <div id="statusBanner" class="status-banner correct">
+                    <span id="statusMessage">वाक्यं शुद्धम् अस्ति। (Sentence is grammatically sound).</span>
+                    <span id="issueCountBadge" class="header-badge" style="display:none;">0 त्रुटयः</span>
+                </div>
+
+                <!-- 1. Interactive Annotated Original Sentence -->
+                <div class="annotated-box">
+                    <div class="annotated-label">मूलवाक्ये दोष-चिह्नानि (Grammar & Spelling Issues in Original Text):</div>
+                    <div id="annotatedTokens" class="annotated-tokens">
+                        <!-- Annotated interactive tokens rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- 2. Corrected Sentence Output Card -->
+                <div class="corrected-output-card">
+                    <div class="annotated-label">शुद्धं संस्कृत-वाक्यम् (Corrected Sanskrit Sentence):</div>
+                    <div id="correctedText" class="corrected-text-display">
+                        <!-- Corrected text rendered here -->
+                    </div>
+
+                    <div class="output-buttons-row">
+                        <button type="button" class="btn-action-icon" onclick="playPronunciation()"
+                            title="उच्चारणं शृणोतु (Listen to Pronunciation)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                            </svg>
+                            उच्चारणम् (Listen)
+                        </button>
+                        <button type="button" class="btn-action-icon" onclick="copyCorrected()"
+                            title="प्रतिलिपिं कुरु (Copy text)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                            </svg>
+                            प्रतिलिपिः (Copy)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. Grammar Rules & Sutras Explanation -->
+                <div class="explanation-section">
+                    <h3 class="section-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                        </svg>
+                        व्याकरण-सूत्राणि एवं व्याख्या (Grammar Rules & Explanations)
+                    </h3>
+                    <div id="explanationList" class="explanation-card-list">
+                        <!-- Dynamic Rule Cards -->
+                    </div>
+                </div>
+
+                <!-- 4. Morphological Analysis Table (पदच्छेद / पद-विश्लेषण) -->
+                <div class="morphology-section" style="margin-top: 25px;">
+                    <h3 class="section-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
+                        </svg>
+                        पद-विश्लेषणम् (Morphological Breakdown)
+                    </h3>
+                    <div class="table-responsive">
+                        <table class="morphology-table">
+                            <thead>
+                                <tr>
+                                    <th>पदम् (Word)</th>
+                                    <th>प्रातिपदिकम् / धातुः (Stem)</th>
+                                    <th>वर्गः (Category)</th>
+                                    <th>लिङ्गम् (Gender)</th>
+                                    <th>विभक्तिः (Case)</th>
+                                    <th>वचनम् / लकारः (Number/Tense)</th>
+                                    <th>अर्थः (Meaning)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="morphologyTableBody">
+                                <!-- Dynamic Morphological rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- TAB 2: SANSKRIT DICTIONARY & PARADIGM EXPLORER -->
+        <!-- ============================================== -->
+        <div id="dictionaryView" style="display: none;">
+            <section class="card dict-search-card" aria-label="Sanskrit Dictionary Search">
+                <h2 class="section-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    संस्कृत-शब्दकोशः (Sanskrit-English Dictionary)
+                </h2>
+
+                <div class="dict-search-bar">
+                    <svg class="dict-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="dictSearchInput" class="dict-search-input" placeholder="Search by Sanskrit, English, or IAST (e.g. read, forest, गम्, वृक्ष, rama, nadi)..." autocomplete="off">
+                </div>
+
+                <div class="dict-filter-chips">
+                    <span style="font-weight: 700; font-size: 13px; color: var(--text-muted); margin-right: 4px;">वर्ग-चयनम्:</span>
+                    <button type="button" class="dict-filter-chip active" onclick="setDictFilter('all', this)">सर्वाणि (All)</button>
+                    <button type="button" class="dict-filter-chip" onclick="setDictFilter('noun', this)">नामपदानि (Nouns)</button>
+                    <button type="button" class="dict-filter-chip" onclick="setDictFilter('verb', this)">धातवः (Verbs)</button>
+                    <button type="button" class="dict-filter-chip" onclick="setDictFilter('pronoun', this)">सर्वनाम (Pronouns)</button>
+                    <button type="button" class="dict-filter-chip" onclick="setDictFilter('adjective', this)">विशेषणानि (Adjectives)</button>
+                    <button type="button" class="dict-filter-chip" onclick="setDictFilter('avyaya', this)">अव्ययानि (Indeclinables)</button>
+                </div>
+            </section>
+
+            <!-- Dictionary Results Count & Grid -->
+            <div id="dictCountBadge" style="margin-bottom: 12px; font-weight: 600; color: var(--text-muted); font-size: 14px;"></div>
+            <div id="dictResultsGrid" class="dict-results-grid">
+                <!-- Dynamically populated dictionary entries -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal for Full Declension / Conjugation Paradigms -->
+    <div id="paradigmModal" class="modal-overlay" onclick="closeParadigmModal(event)">
+        <div class="modal-content-card" onclick="event.stopPropagation()">
+            <button type="button" class="modal-close-btn" onclick="closeParadigmModal()">&times;</button>
+            <h3 id="modalTitle" style="font-family: var(--font-devanagari); font-size: 22px; color: var(--primary); margin-bottom: 6px;">रूपावली</h3>
+            <p id="modalSubtitle" style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;"></p>
+            <div id="modalTableContainer" class="table-responsive">
+                <!-- Paradigm tables injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast">प्रतिलिपिः कृता (Copied to Clipboard!)</div>
+
+    <footer>
+        <p>made by Kavya Makwana | काव्यया मकवाणया निर्मितम्</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/sanskrit-transliterate.js"></script>
+    <script src="js/sanskrit-grammar-engine.js"></script>
+
+    <script>
+        let currentAnalysisResult = null;
+        let currentDictFilter = 'all';
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            const grammarView = document.getElementById('grammarView');
+            const dictionaryView = document.getElementById('dictionaryView');
+            const tabGrammarBtn = document.getElementById('tabGrammarBtn');
+            const tabDictBtn = document.getElementById('tabDictBtn');
+
+            if (tab === 'grammar') {
+                grammarView.style.display = 'block';
+                dictionaryView.style.display = 'none';
+                tabGrammarBtn.classList.add('active');
+                tabDictBtn.classList.remove('active');
+            } else {
+                grammarView.style.display = 'none';
+                dictionaryView.style.display = 'block';
+                tabGrammarBtn.classList.remove('active');
+                tabDictBtn.classList.add('active');
+                renderDictionary();
+            }
+        }
+
+        // Auto-transliterate Roman characters as user types
+        const inputArea = document.getElementById("sanskritInput");
+        const autoTranslitCheckbox = document.getElementById("autoTranslit");
+
+        inputArea.addEventListener("input", function (e) {
+            if (autoTranslitCheckbox.checked && SanskritTransliterate.hasRoman(this.value)) {
+                let start = this.selectionStart;
+                let end = this.selectionEnd;
+                let origLen = this.value.length;
+
+                this.value = SanskritTransliterate.toDevanagari(this.value);
+
+                let newLen = this.value.length;
+                let diff = newLen - origLen;
+                this.setSelectionRange(start + diff, end + diff);
+            }
+        });
+
+        // Enter key triggers check (with Ctrl/Cmd or Shift)
+        inputArea.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                correctSanskrit();
+            }
+        });
+
+        function insertDiacritic(char) {
+            let start = inputArea.selectionStart;
+            let end = inputArea.selectionEnd;
+            let text = inputArea.value;
+
+            inputArea.value = text.substring(0, start) + char + text.substring(end);
+            inputArea.focus();
+            inputArea.setSelectionRange(start + char.length, start + char.length);
+        }
+
+        function loadExample(sentence) {
+            switchTab('grammar');
+            inputArea.value = sentence;
+            correctSanskrit();
+        }
+
+        function clearInput() {
+            inputArea.value = "";
+            document.getElementById("resultContainer").style.display = "none";
+            inputArea.focus();
+        }
+
+        function correctSanskrit() {
+            let input = inputArea.value.trim();
+            if (!input) {
+                alert("कृपया प्रथमं संस्कृत-वाक्यं प्रविशतु। (Please enter a Sanskrit sentence).");
+                inputArea.focus();
+                return;
+            }
+
+            if (SanskritTransliterate.hasRoman(input)) {
+                input = SanskritTransliterate.toDevanagari(input);
+                inputArea.value = input;
+            }
+
+            let result = SanskritGrammarEngine.analyzeAndCorrect(input);
+            currentAnalysisResult = result;
+            renderResults(result);
+        }
+
+        function renderResults(res) {
+            const container = document.getElementById("resultContainer");
+            container.style.display = "block";
+
+            // Status Banner
+            const statusBanner = document.getElementById("statusBanner");
+            const statusMessage = document.getElementById("statusMessage");
+            const issueCountBadge = document.getElementById("issueCountBadge");
+
+            if (res.isCorrect) {
+                statusBanner.className = "status-banner correct";
+                statusMessage.innerHTML = "✅ <strong>साधु!</strong> अस्मिन् वाक्ये कोऽपि व्याकरण-दोषः नास्ति। (Sentence is grammatically sound).";
+                issueCountBadge.style.display = "none";
+            } else {
+                statusBanner.className = "status-banner has-errors";
+                statusMessage.innerHTML = `⚠️ वाक्ये <strong>${res.issues.length}</strong> व्याकरण/वर्तनी-संशोधनानि प्राप्तानि (Found ${res.issues.length} issue(s)).`;
+                issueCountBadge.innerText = `${res.issues.length} त्रुटयः`;
+                issueCountBadge.style.display = "inline-flex";
+            }
+
+            // Annotated Original Tokens
+            const annotatedTokensBox = document.getElementById("annotatedTokens");
+            annotatedTokensBox.innerHTML = "";
+
+            res.tokenAnalyses.forEach((item, idx) => {
+                let wordSpan = document.createElement("span");
+                wordSpan.className = "annotated-word";
+
+                if (item.hasIssue) {
+                    let firstIssue = item.issues[0];
+                    let isWarning = firstIssue.severity === "warning" || firstIssue.severity === "info";
+                    wordSpan.classList.add("has-issue");
+                    if (isWarning) wordSpan.classList.add("sandhi-issue");
+
+                    let badge = document.createElement("span");
+                    badge.className = "word-badge" + (isWarning ? " warning-badge" : "");
+                    badge.innerText = firstIssue.category.split(" ")[0];
+                    wordSpan.appendChild(badge);
+
+                    wordSpan.title = `${firstIssue.title}: ${firstIssue.explanation}`;
+                    wordSpan.onclick = () => {
+                        let card = document.getElementById(`rule-card-${idx}`);
+                        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+                    };
+                } else {
+                    wordSpan.classList.add("correct-word");
+                }
+
+                let textNode = document.createTextNode(item.word);
+                wordSpan.appendChild(textNode);
+                annotatedTokensBox.appendChild(wordSpan);
+            });
+
+            // Corrected Text Display
+            const correctedTextDiv = document.getElementById("correctedText");
+            correctedTextDiv.innerText = res.corrected;
+
+            // Grammar Rules & Explanations List
+            const explanationList = document.getElementById("explanationList");
+            explanationList.innerHTML = "";
+
+            if (res.isCorrect) {
+                let okCard = document.createElement("div");
+                okCard.className = "rule-item-box";
+                okCard.style.borderLeftColor = "var(--success)";
+                okCard.innerHTML = `
+                    <div class="rule-title" style="color:var(--success);">✅ व्याकरण-शुद्धम् (All Grammatical Rules Satisfied)</div>
+                    <div class="rule-desc" style="margin-top:6px;">सर्वाणि पदानि, वर्तनी, सन्धयः, कारकाणि, कर्तृ-क्रिया-सङ्गतिः च शास्त्रोक्ताः सन्ति। (All words, spellings, sandhi, cases, and verb agreements follow standard Paninian grammar).</div>
+                `;
+                explanationList.appendChild(okCard);
+            } else {
+                res.issues.forEach((iss, i) => {
+                    let card = document.createElement("div");
+                    let sevClass = iss.severity === "warning" ? "rule-warning" : (iss.severity === "info" ? "rule-info" : "");
+                    card.className = `rule-item-box ${sevClass}`;
+                    card.id = `rule-card-${iss.tokenIndex}`;
+
+                    card.innerHTML = `
+                        <div class="rule-header">
+                            <span class="rule-category-tag">${iss.category}</span>
+                            <span class="rule-title">${iss.title}</span>
+                        </div>
+                        <div class="rule-correction-row">
+                            <span class="correction-orig">${iss.origToken}</span>
+                            <span class="arrow-symbol">➔</span>
+                            <span class="correction-target">${iss.correctedToken}</span>
+                        </div>
+                        <div class="rule-desc">${iss.explanation}</div>
+                    `;
+                    explanationList.appendChild(card);
+                });
+            }
+
+            // Morphological Breakdown Table
+            const tableBody = document.getElementById("morphologyTableBody");
+            tableBody.innerHTML = "";
+
+            res.tokenAnalyses.forEach(item => {
+                let tr = document.createElement("tr");
+
+                let badgeClass = "badge-noun";
+                if (item.category.includes("क्रियापदम्")) badgeClass = "badge-verb";
+                else if (item.category.includes("अव्ययम्")) badgeClass = "badge-avyaya";
+                else if (item.category.includes("विशेषणम्")) badgeClass = "badge-adj";
+
+                tr.innerHTML = `
+                    <td class="word-cell">${item.word}</td>
+                    <td class="stem-cell">${item.stem}</td>
+                    <td><span class="badge-tag ${badgeClass}">${item.category}</span></td>
+                    <td>${item.linga}</td>
+                    <td>${item.vibhakti}</td>
+                    <td>${item.vachana !== '-' ? item.vachana : (item.lakara !== '-' ? item.lakara : '-')}</td>
+                    <td>${item.meaning}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            container.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function copyCorrected() {
+            if (!currentAnalysisResult || !currentAnalysisResult.corrected) return;
+
+            navigator.clipboard.writeText(currentAnalysisResult.corrected).then(() => {
+                let toast = document.getElementById("toast");
+                toast.style.display = "block";
+                setTimeout(() => {
+                    toast.style.display = "none";
+                }, 2500);
+            }).catch(err => {
+                console.error("Copy failed", err);
+            });
+        }
+
+        function playPronunciation() {
+            if (!currentAnalysisResult || !currentAnalysisResult.corrected) return;
+            if (!('speechSynthesis' in window)) {
+                alert("Speech synthesis is not supported in this browser.");
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(currentAnalysisResult.corrected);
+            utterance.lang = "sa-IN";
+            utterance.rate = 0.85;
+
+            let voices = window.speechSynthesis.getVoices();
+            let indianVoice = voices.find(v => v.lang.startsWith("hi") || v.lang.startsWith("sa"));
+            if (indianVoice) utterance.voice = indianVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // ==========================================
+        // DICTIONARY UI & PARADIGM VIEWER
+        // ==========================================
+
+        const dictSearchInput = document.getElementById('dictSearchInput');
+        dictSearchInput.addEventListener('input', function() {
+            renderDictionary();
+        });
+
+        function setDictFilter(filter, el) {
+            currentDictFilter = filter;
+            document.querySelectorAll('.dict-filter-chip').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            renderDictionary();
+        }
+
+        function renderDictionary() {
+            const query = dictSearchInput.value.trim();
+            const results = SanskritGrammarEngine.searchDictionary(query, currentDictFilter);
+            const grid = document.getElementById('dictResultsGrid');
+            const countBadge = document.getElementById('dictCountBadge');
+
+            countBadge.innerText = `कुल-पदानि (Found ${results.length} entries):`;
+            grid.innerHTML = '';
+
+            if (results.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+                    <p style="font-size: 18px; margin-bottom: 8px;">कोऽपि शब्दः न प्राप्तः (No dictionary matches found).</p>
+                    <p style="font-size: 14px;">Try searching in English (e.g. 'read', 'forest', 'water') or Devanagari (e.g. 'पठ्', 'वन', 'जल')</p>
+                </div>`;
+                return;
+            }
+
+            results.forEach((entry, idx) => {
+                let card = document.createElement('div');
+                card.className = 'dict-card';
+
+                let badgeColor = 'var(--primary)';
+                if (entry.type.includes('क्रियापदम्')) badgeColor = 'var(--purple)';
+                else if (entry.type.includes('अव्यय')) badgeColor = 'var(--gold-dark)';
+                else if (entry.type.includes('विशेषण')) badgeColor = 'var(--info)';
+
+                let paradigmBtnHtml = '';
+                if (entry.paradigmData || entry.verbForms) {
+                    paradigmBtnHtml = `
+                        <button type="button" class="btn-view-paradigm" onclick="openParadigmModal(${idx})">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+                            रूपावली (View Full Table)
+                        </button>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <div class="dict-card-header">
+                            <span class="dict-entry-title">${entry.title}</span>
+                            <span class="dict-type-badge" style="background:${badgeColor}22; color:${badgeColor}; border:1px solid ${badgeColor}44;">${entry.type}</span>
+                        </div>
+                        <div class="dict-subtype">${entry.subType}</div>
+                        <div class="dict-meaning-en">${entry.meaningEn}</div>
+                        ${entry.meaningHi ? `<div class="dict-meaning-hi">हिन्दी: ${entry.meaningHi}</div>` : ''}
+                        ${entry.examples && entry.examples.length > 0 ? `
+                            <div class="dict-examples-box">
+                                <strong>उदा:</strong> ${entry.examples.join(' • ')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div>
+                        ${paradigmBtnHtml}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Modal Paradigm Viewer
+        function openParadigmModal(entryIndex) {
+            const query = dictSearchInput.value.trim();
+            const results = SanskritGrammarEngine.searchDictionary(query, currentDictFilter);
+            const entry = results[entryIndex];
+            if (!entry) return;
+
+            const modal = document.getElementById('paradigmModal');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const container = document.getElementById('modalTableContainer');
+
+            title.innerText = `${entry.title} - रूपावली (Full Paradigm)`;
+            subtitle.innerText = `${entry.type} • ${entry.subType} • ${entry.meaningEn}`;
+            container.innerHTML = '';
+
+            if (entry.paradigmData) {
+                let table = document.createElement('table');
+                table.className = 'morphology-table';
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>विभक्तिः (Case)</th>
+                            <th>एकवचनम् (Singular)</th>
+                            <th>द्विवचनम् (Dual)</th>
+                            <th>बहुवचनम् (Plural)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${[1,2,3,4,5,6,7].map(v => {
+                            let vibhNames = ['', 'प्रथमा (1st)', 'द्वितीया (2nd)', 'तृतीया (3rd)', 'चतुर्थी (4th)', 'पञ्चमी (5th)', 'षष्ठी (6th)', 'सप्तमी (7th)'];
+                            let row = entry.paradigmData[v] || ['-', '-', '-'];
+                            return `<tr>
+                                <td style="font-weight:700; color:var(--primary);">${vibhNames[v]}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${row[0]}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${row[1]}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${row[2]}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                `;
+                container.appendChild(table);
+            } else if (entry.verbForms) {
+                for (let [lakara, pObj] of Object.entries(entry.verbForms)) {
+                    let lakaraHead = document.createElement('h4');
+                    lakaraHead.style.margin = '16px 0 8px';
+                    lakaraHead.style.color = 'var(--primary)';
+                    let lakaraDesc = lakara === 'लट्' ? 'लट् लकारः (Present Tense)' :
+                                     (lakara === 'लङ्' ? 'लङ् लकारः (Past Tense)' :
+                                     (lakara === 'लृट्' ? 'लृट् लकारः (Future Tense)' :
+                                     (lakara === 'लोट्' ? 'लोट् लकारः (Imperative)' : 'विधिलिङ् लकारः (Potential)')));
+                    lakaraHead.innerText = lakaraDesc;
+                    container.appendChild(lakaraHead);
+
+                    let table = document.createElement('table');
+                    table.className = 'morphology-table';
+                    table.style.marginBottom = '16px';
+                    table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>पुरुषः (Person)</th>
+                                <th>एकवचनम् (Singular)</th>
+                                <th>द्विवचनम् (Dual)</th>
+                                <th>बहुवचनम् (Plural)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight:700;">प्रथमपुरुषः (3rd)</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[3] ? pObj[3][0] : '-'}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[3] ? pObj[3][1] : '-'}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[3] ? pObj[3][2] : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:700;">मध्यमपुरुषः (2nd)</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[2] ? pObj[2][0] : '-'}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[2] ? pObj[2][1] : '-'}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[2] ? pObj[2][2] : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:700;">उत्तमपुरुषः (1st)</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[1] ? pObj[1][0] : '-'}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[1] ? pObj[1][1] : '-'}</td>
+                                <td style="font-family:var(--font-devanagari); font-weight:600;">${pObj[1] ? pObj[1][2] : '-'}</td>
+                            </tr>
+                        </tbody>
+                    `;
+                    container.appendChild(table);
+                }
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeParadigmModal(e) {
+            const modal = document.getElementById('paradigmModal');
+            modal.style.display = 'none';
+        }
+    </script>
+
+</body>
+
+</html>
