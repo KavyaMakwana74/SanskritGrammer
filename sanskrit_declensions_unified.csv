@@ -1,0 +1,20 @@
+﻿table_name,category_gender,case_vibhakti,ekavacana,dvivacana,bahuvacana,english_meaning
+Balaka (Noun),Masculine (-a),Prathama (1st),बालकः,बालकौ,बालकाः,Nominative (Subject)
+Balaka (Noun),Masculine (-a),Dvitiya (2nd),बालकम्,बालकौ,बालकान्,Accusative (Direct Object)
+Balaka (Noun),Masculine (-a),Tritiya (3rd),बालकेन,बालकाभ्याम्,बालकैः,Instrumental (By / With)
+Balaka (Noun),Masculine (-a),Chaturthi (4th),बालकाय,बालकाभ्याम्,बालकेभ्यः,Dative (To / For)
+Balaka (Noun),Masculine (-a),Panchami (5th),बालकात्,बालकाभ्याम्,बालकेभ्यः,Ablative (From)
+Balaka (Noun),Masculine (-a),Shasthi (6th),बालकस्य,बालकयोः,बालकानाम्,Genitive (Of / 's)
+Balaka (Noun),Masculine (-a),Saptami (7th),बालके,बालकयोः,बालकेषु,Locative (In / On / At)
+Balaka (Noun),Masculine (-a),Sambodhana (Vocative),हे बालक,हे बालकौ,हे बालकाः,Address / Calling
+Balika (Noun),Feminine (-a),Prathama (1st),बालिका,बालिके,बालिकाः,Nominative (Subject)
+Balika (Noun),Feminine (-a),Dvitiya (2nd),बालिकाम्,बालिके,बालिकाः,Accusative (Direct Object)
+Balika (Noun),Feminine (-a),Tritiya (3rd),बालिकया,बालिकाभ्याम्,बालिकाभिः,Instrumental (By / With)
+Balika (Noun),Feminine (-a),Chaturthi (4th),बालिकायै,बालिकाभ्याम्,बालिकाभ्यः,Dative (To / For)
+Balika (Noun),Feminine (-a),Panchami (5th),बालिकायाः,बालिकाभ्याम्,बालिकाभ्यः,Ablative (From)
+Balika (Noun),Feminine (-a),Shasthi (6th),बालिकायाः,बालिकयोः,बालिकानाम्,Genitive (Of / 's)
+Balika (Noun),Feminine (-a),Saptami (7th),बालिकायाम्,बालिकयोः,बालिकासु,Locative (In / On / At)
+Balika (Noun),Feminine (-a),Sambodhana (Vocative),हे बालिके,हे बालिके,हे बालिकाः,Address / Calling
+Pronoun (Tad),Masculine,Prathama (Nominative),सः (Saḥ),तौ (Tau),ते (Te),He / Two of them / They
+Pronoun (Tad),Feminine,Prathama (Nominative),सा (Sā),ते (Te),ताः (Tāḥ),She / Two of them / They
+Pronoun (Tad),Neuter,Prathama (Nominative),तत् (Tat),ते (Te),तानि (Tāni),It / Two of them / They

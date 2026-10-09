@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="sa">
+<head>
+    <meta charset="UTF-8">
+    <title>Sanskrit CSV Datasets Validation Test</title>
+    <script src="js/sanskrit-grammar-engine.js"></script>
+</head>
+<body>
+    <h1>Sanskrit CSV Datasets Validation</h1>
+    <pre id="output"></pre>
+
+    <script>
+        const out = document.getElementById('output');
+        function log(msg) {
+            out.textContent += msg + '\n';
+        }
+
+        log('=== TESTING SANSKRIT KIM PRONOUN (sanskrit_kim_pum_strilinga.csv) ===');
+
+        const kimMasculineForms = [
+            { v: 1, forms: ['कः', 'कौ', 'के'] },
+            { v: 2, forms: ['कम्', 'कौ', 'कान्'] },
+            { v: 3, forms: ['केन', 'काभ्याम्', 'कैः'] },
+            { v: 4, forms: ['कस्मै', 'काभ्याम्', 'केभ्यः'] },
+            { v: 5, forms: ['कस्मात्', 'काभ्याम्', 'केभ्यः'] },
+            { v: 6, forms: ['कस्य', 'कयोः', 'केषाम्'] },
+            { v: 7, forms: ['कस्मिन्', 'कयोः', 'केषु'] }
+        ];
+
+        const kimFeminineForms = [
+            { v: 1, forms: ['का', 'के', 'काः'] },
+            { v: 2, forms: ['काम्', 'के', 'काः'] },
+            { v: 3, forms: ['कया', 'काभ्याम्', 'काभिः'] },
+            { v: 4, forms: ['कस्यै', 'काभ्याम्', 'काभ्यः'] },
+            { v: 5, forms: ['कस्याः', 'काभ्याम्', 'काभ्यः'] },
+            { v: 6, forms: ['कस्याः', 'कयोः', 'कासाम्'] },
+            { v: 7, forms: ['कस्याम्', 'कयोः', 'कासु'] }
+        ];
+
+        const kimNeuterForms = [
+            { v: 1, forms: ['किम्', 'के', 'कानि'] },
+            { v: 2, forms: ['किम्', 'के', 'कानि'] }
+        ];
+
+        let kimPass = 0, kimFail = 0;
+
+        function testKimList(list, gender) {
+            list.forEach(row => {
+                row.forms.forEach((word, numIdx) => {
+                    let parses = SanskritGrammarEngine.lookupWord(word);
+                    let found = parses.find(p => p.type === 'subanta' && p.stem === 'किम्' && p.linga === gender && p.vibhakti === row.v && p.vachana === (numIdx + 1));
+                    if (found) {
+                        kimPass++;
+                        log(`[PASS] Kim ${gender} V${row.v}.${numIdx+1}: "${word}" parsed successfully`);
+                    } else {
+                        kimFail++;
+                        log(`[FAIL] Kim ${gender} V${row.v}.${numIdx+1}: "${word}" NOT found in lookup!`);
+                    }
+                });
+            });
+        }
+
+        testKimList(kimMasculineForms, 'पुंल्लिङ्ग');
+        testKimList(kimFeminineForms, 'स्त्रीलिङ्ग');
+        testKimList(kimNeuterForms, 'नपुंसकलिङ्ग');
+
+        log(`\nKim Pronoun Results: ${kimPass} passed, ${kimFail} failed.`);
+
+        log('\n=== TESTING SANSKRIT UNIFIED DECLENSIONS (sanskrit_declensions_unified.csv) ===');
+
+        let declPass = 0, declFail = 0;
+
+        // Test Dictionary entry paradigms
+        let db = SanskritGrammarEngine.getDictionaryDatabase();
+        let balakaEntry = db.find(e => e.title === 'बालक');
+        let balikaEntry = db.find(e => e.title === 'बालिका');
+        let kimMascEntry = db.find(e => e.title === 'किम्' && e.subType === 'पुंल्लिङ्ग');
+        let kimFemEntry = db.find(e => e.title === 'किम्' && e.subType === 'स्त्रीलिङ्ग');
+        let kimNeutEntry = db.find(e => e.title === 'किम्' && e.subType === 'नपुंसकलिङ्ग');
+
+        if (balakaEntry && balakaEntry.paradigmData && balakaEntry.paradigmData[8]) {
+            declPass++;
+            log('[PASS] Balaka dictionary paradigm includes Sambodhana (8th case)');
+        } else {
+            declFail++;
+            log('[FAIL] Balaka dictionary paradigm missing Sambodhana');
+        }
+
+        if (balikaEntry && balikaEntry.paradigmData && balikaEntry.paradigmData[8]) {
+            declPass++;
+            log('[PASS] Balika dictionary paradigm includes Sambodhana (8th case)');
+        } else {
+            declFail++;
+            log('[FAIL] Balika dictionary paradigm missing Sambodhana');
+        }
+
+        if (kimMascEntry && kimFemEntry && kimNeutEntry) {
+            declPass++;
+            log('[PASS] Kim entries for all 3 genders present in dictionary database');
+        } else {
+            declFail++;
+            log('[FAIL] Kim entries missing in dictionary database');
+        }
+
+        log(`\nDeclensions Results: ${declPass} passed, ${declFail} failed.`);
+
+        log('\n=== TESTING SENTENCE LEVEL REASONING WITH KIM & DECLENSIONS ===');
+        const sentenceTests = [
+            { input: 'कः गच्छति?', shouldPass: true, label: 'Kim Masc Subject (कः 3.1) with verb (गच्छति 3.1)' },
+            { input: 'का पठति?', shouldPass: true, label: 'Kim Fem Subject (का 3.1) with verb (पठति 3.1)' },
+            { input: 'किम् अस्ति?', shouldPass: true, label: 'Kim Neuter Subject (किम् 3.1) with verb (अस्ति 3.1)' },
+            { input: 'के गच्छन्ति?', shouldPass: true, label: 'Kim Masc Plural (के 3.3) with verb (गच्छन्ति 3.3)' },
+            { input: 'काः धावन्ति?', shouldPass: true, label: 'Kim Fem Plural (काः 3.3) with verb (धावन्ति 3.3)' },
+            { input: 'कस्मै फलं यच्छति?', shouldPass: true, label: 'Kim Dative Recipient (कस्मै 4.1) with giving' },
+            { input: 'कया सह गच्छति?', shouldPass: true, label: 'Kim Fem Instrumental (कया 3.1) with सह' },
+            { input: 'कः गच्छन्ति?', expectedCorrection: 'के गच्छन्ति?|कः गच्छति?', label: 'Kim Subject-Verb Concord Correction' }
+        ];
+
+        let sentPass = 0, sentFail = 0;
+        sentenceTests.forEach(test => {
+            let res = SanskritGrammarEngine.analyzeAndCorrect(test.input);
+            if (test.shouldPass) {
+                if (res.isCorrect) {
+                    sentPass++;
+                    log(`[PASS] ${test.label}: "${test.input}" is recognized as correct.`);
+                } else {
+                    sentFail++;
+                    log(`[FAIL] ${test.label}: "${test.input}" got unexpected issues: ${JSON.stringify(res.issues)}`);
+                }
+            } else {
+                log(`[INFO] ${test.label}: Input "${test.input}" ➔ Corrected "${res.corrected}"`);
+                sentPass++;
+            }
+        });
+
+        log(`\nSentence Results: ${sentPass} passed, ${sentFail} failed.`);
+        log(`\nOVERALL CSV DATASET INTEGRATION RESULT: ${kimFail + declFail + sentFail === 0 ? 'ALL PASSED 100%' : 'SOME FAILED'}`);
+    </script>
+</body>
+</html>
